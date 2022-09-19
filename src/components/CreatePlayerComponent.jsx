@@ -21,7 +21,7 @@ export function CreatePlayerComponent() {
 		name: "",
 		surname: "",
 		dateOfBirth: date,
-		position: "",
+		position: "STRIKER",
 	};
 	const [player, setPlayer] = useState(initialState);
 	
@@ -128,7 +128,8 @@ export function CreatePlayerComponent() {
 		  <div className="form-group">
 					<label>Position</label>
 					<select name="position" value={player.position} onChange={handleChange} className="form-control">
-  							<option value="STRIKER">Striker</option>
+							
+  							<option selected value="STRIKER">Striker</option>
   							<option value="MIDFIELD">Midfield</option>
   							<option value="DEFENDER">Defender</option>
   							<option value="GOALKEEPER">Goalkeeper</option>
@@ -142,6 +143,7 @@ export function CreatePlayerComponent() {
 						Add
 					</button>
 					
+					
 					<button
 						type="button"
 						onClick={handleCancel}
@@ -151,6 +153,13 @@ export function CreatePlayerComponent() {
 					</button>
 				</div>
 			</form>
+
+			<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}  action={action}>
+                                        <Alert severity="success">Smazáno!</Alert>
+                                                                     </Snackbar>
+                                        <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
+                                        <Alert severity="error">Akce se nezdařila</Alert>
+                                                                     </Snackbar>
 		</div>
 	);
     

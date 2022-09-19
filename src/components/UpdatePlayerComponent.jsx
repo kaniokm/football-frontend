@@ -3,6 +3,10 @@ import { get, put } from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import { parseISO, format, toDate } from 'date-fns';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Alert from '@mui/material/Alert';
 import authHeader from './AuthHeader';
 import Moment, { now } from 'moment';
 
@@ -10,6 +14,9 @@ import Moment, { now } from 'moment';
 export function UpdatePlayerComponent(props) {
 
 	const [date, setDate] = useState(new Date());
+	const [open, setOpen] = React.useState(false);
+	const [openFail, setOpenFail] = React.useState(false);
+
 	
 
     const initialState = {
@@ -56,6 +63,26 @@ export function UpdatePlayerComponent(props) {
 		},
 		[props]
 	);
+	const handleClose = () => {
+        
+    
+        setOpen(false);
+        setOpenFail(false);
+      };
+    
+      const action = (
+        <React.Fragment>
+          
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+      );
 
 	function handleSubmit(event) {
 		event.preventDefault();
@@ -129,6 +156,12 @@ export function UpdatePlayerComponent(props) {
 					<button type="submit" className="btn btn-primary">
 						Update
 					</button>
+					<Snackbar open={open} autoHideDuration={6000} onClose={handleClose}  action={action}>
+                                        <Alert severity="success">Smazáno!</Alert>
+                                                                     </Snackbar>
+                                        <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
+                                        <Alert severity="error">Akce se nezdařila</Alert>
+                                                                     </Snackbar>
 					<button
 						type="button"
 						onClick={handleCancel}

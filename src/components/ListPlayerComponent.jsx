@@ -126,20 +126,23 @@ function ListPlayerComponent() {
                                         
                                         <Link to={{ pathname:`/update-player/${player.id}`}}> <Button color="primary">Update</Button> </Link>
                                         <Button onClick={() => handleDelete(player.id)} className="btn btn-danger">Delete</Button>
-                                        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}  action={action}>
+                                        
+                                    </td>
+                                </tr>
+                            )
+
+
+                            
+                        }
+                    </tbody>
+                </Table>
+            </Row>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}  action={action}>
                                         <Alert severity="success">Smazáno!</Alert>
                                                                      </Snackbar>
                                         <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
                                         <Alert severity="error">Akce se nezdařila</Alert>
                                                                      </Snackbar>
-                                    </td>
-                                </tr>
-                            )
-                        }
-                    </tbody>
-                </Table>
-            </Row>
-
         </div>
     );
     
