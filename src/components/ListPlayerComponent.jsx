@@ -12,6 +12,7 @@ import { matchSorter } from 'match-sorter';
 import PlayerService from '../services/PlayerService';
 import { parseISO, format, toDate } from 'date-fns';
 import { useTable, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table';
+import Moment from 'moment';
 
 
 function ListPlayerComponent() {
@@ -104,9 +105,10 @@ function ListPlayerComponent() {
                 <Table striped bordered responsive hover>
                     <thead>
                         <tr>
-                            <th>Player First Name</th>
-                            <th>Player Last Name</th>
-                            <th>Player Date of Birth</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Date of Birth</th>
+                            <th>Position</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -117,7 +119,8 @@ function ListPlayerComponent() {
                                 <tr key = {player.id}>
                                     <td> {player.name} </td>
                                     <td> {player.surname} </td>
-                                    <td> {toDate(parseISO(player.dateOfBirth)).toDateString} </td>
+                                    <td> {Moment(player.dateOfBirth).format('DD. MMM YYYY')} </td>
+                                    <td> {player.position}</td>
                                     
                                     <td>
                                         

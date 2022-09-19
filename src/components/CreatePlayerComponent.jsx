@@ -5,15 +5,23 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Alert from '@mui/material/Alert';
+import authHeader from './AuthHeader';
 
 export function CreatePlayerComponent() {
 
 	const [date, setDate] = useState(new Date());
+	const [open, setOpen] = React.useState(false);
+	const [openFail, setOpenFail] = React.useState(false);
 
 	const initialState = {
 		name: "",
 		surname: "",
 		dateOfBirth: date,
+		position: "",
 	};
 	const [player, setPlayer] = useState(initialState);
 	
@@ -26,11 +34,16 @@ export function CreatePlayerComponent() {
 		event.preventDefault();
 		async function addPlayer() {
 			try {
-				await post(`http://localhost:8080/player/`, player);
+				await post(`http://localhost:8080/player`, player,{ headers: {"Authorization" : `Bearer `+authHeader(),
+				"Access-Control-Allow-Origin": "*",
+				 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+			} });
 				console.log(player);
+				setOpen(true);
 				navigate(`/`);
 			} catch (error) {
 				console.log(error);
+				setOpenFail(true);
 			}
 		}
 		addPlayer();
@@ -47,6 +60,35 @@ export function CreatePlayerComponent() {
 	function handleCancel() {
 		navigate(`/`);
 	}
+
+	function updatePosition(position) {
+        setPlayer({
+            position: position.value
+        });
+    };
+
+
+
+	const handleClose = () => {
+        
+    
+        setOpen(false);
+        setOpenFail(false);
+      };
+    
+      const action = (
+        <React.Fragment>
+          
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+      );
 
 
     
@@ -80,14 +122,26 @@ export function CreatePlayerComponent() {
 				</div>
 				<div className="form-group">
             <label>Select Date: </label>
-            <DatePicker dateFormat="yyyy/MM/dd" selected={player.dateOfBirth} startDate={player.dateOfBirth} onChange={date => handleChangeDate(date)  } />
+            <DatePicker dateFormat="yyyy/MM/dd"  selected={player.dateOfBirth} onChange={(date) => handleChangeDate(date) } />
           </div>
+
+		  <div className="form-group">
+					<label>Position</label>
+					<select name="position" value={player.position} onChange={handleChange} className="form-control">
+  							<option value="STRIKER">Striker</option>
+  							<option value="MIDFIELD">Midfield</option>
+  							<option value="DEFENDER">Defender</option>
+  							<option value="GOALKEEPER">Goalkeeper</option>
+					</select>
+					
+				</div>
 
 				
 				<div className="btn-group">
 					<button type="submit" className="btn btn-primary">
 						Add
 					</button>
+					
 					<button
 						type="button"
 						onClick={handleCancel}

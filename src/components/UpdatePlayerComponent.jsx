@@ -3,11 +3,14 @@ import { get, put } from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import DatePicker from 'react-datepicker';
 import { parseISO, format, toDate } from 'date-fns';
+import authHeader from './AuthHeader';
+import Moment, { now } from 'moment';
 
 
 export function UpdatePlayerComponent(props) {
 
 	const [date, setDate] = useState(new Date());
+	
 
     const initialState = {
 		name: "",
@@ -23,20 +26,27 @@ export function UpdatePlayerComponent(props) {
 		function () {
 			async function updatePlayer() {
 				try {
-					const response = await get(`http://localhost:8080/player/${_id}`);
+					const response = await get(`http://localhost:8080/player/${_id}`,{ headers: {"Authorization" : `Bearer `+authHeader(),
+					"Access-Control-Allow-Origin": "*",
+					 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+				} });
+					
 					setPlayer({
 						
 						name: response.data.name,
 						surname: response.data.surname,
+						dateOfBirth: response.data.dateOfBirth,
+
 						
-						dateOfBirth: toDate(parseISO(response.data.dateOfBirth),1),
+						
 					}
 						
 					)
 					
-					console.log(response.data);
+					
 					console.log(player);
-					console.log(toDate(parseISO(response.data.dateOfBirth),1));
+					console.log( response.data.dateOfBirth);
+					console.log( player.date);
 					
 				} catch (error) {
 					console.log(error);
@@ -51,7 +61,10 @@ export function UpdatePlayerComponent(props) {
 		event.preventDefault();
 		async function updatePlayerPut() {
 			try {
-				await put(`http://localhost:8080/player/${_id}`, player);
+				await put(`http://localhost:8080/player/${_id}`, player,{ headers: {"Authorization" : `Bearer `+authHeader(),
+				"Access-Control-Allow-Origin": "*",
+				 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+			} });
 				console.log(player);
 				navigate(`/`);
 			} catch (error) {
@@ -106,9 +119,11 @@ export function UpdatePlayerComponent(props) {
 				</div>
 
 				<div className="form-group">
+				
             <label>Select Date: </label>
-            <DatePicker dateFormat="yyyy/MM/dd" selected={player.dateOfBirth} startDate={player.dateOfBirth} onChange={date => handleChangeDate(date)  } />
+            <DatePicker dateFormat="yyyy/MM/dd"  selected={player.dateOfBirth} onChange={(date) => handleChangeDate(date) } />
           </div>
+
 				
 				<div className="btn-group">
 					<button type="submit" className="btn btn-primary">
