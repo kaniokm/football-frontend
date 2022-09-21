@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { get, put } from "axios";
+
 import { useNavigate, useParams } from "react-router-dom";
-import DatePicker from 'react-datepicker';
-import { parseISO, format, toDate } from 'date-fns';
+import { DatePicker,LocalizationProvider } from "@mui/x-date-pickers";
+import { TextField } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Alert from '@mui/material/Alert';
-import authHeader from './AuthHeader';
-import Moment, { now } from 'moment';
+
+import PlayerService from "../services/PlayerService";
 
 
 export function UpdatePlayerComponent(props) {
 
-	const [date, setDate] = useState(new Date());
+	
 	const [open, setOpen] = React.useState(false);
 	const [openFail, setOpenFail] = React.useState(false);
+	const [errorText, setErrorText] = React.useState(false);
 
 	
 
     const initialState = {
 		name: "",
 		surname: "",
-		dateOfBirth: date,
+		dateOfBirth: new Date(),
+		position: "",
 	};
 	const [player, setPlayer] = useState(initialState);
 	
@@ -33,17 +37,14 @@ export function UpdatePlayerComponent(props) {
 		function () {
 			async function updatePlayer() {
 				try {
-					const response = await get(`http://localhost:8080/player/${_id}`,{ headers: {"Authorization" : `Bearer `+authHeader(),
-					"Access-Control-Allow-Origin": "*",
-					 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-				} });
+					const response = await PlayerService.getPlayerById(_id);
 					
 					setPlayer({
 						
 						name: response.data.name,
 						surname: response.data.surname,
 						dateOfBirth: response.data.dateOfBirth,
-
+						position: response.data.position,
 						
 						
 					}
@@ -51,9 +52,7 @@ export function UpdatePlayerComponent(props) {
 					)
 					
 					
-					console.log(player);
-					console.log( response.data.dateOfBirth);
-					console.log( player.date);
+					
 					
 				} catch (error) {
 					console.log(error);
@@ -61,7 +60,7 @@ export function UpdatePlayerComponent(props) {
 			}
 			updatePlayer();
 		},
-		[props]
+		
 	);
 	const handleClose = () => {
         
@@ -88,14 +87,22 @@ export function UpdatePlayerComponent(props) {
 		event.preventDefault();
 		async function updatePlayerPut() {
 			try {
-				await put(`http://localhost:8080/player/${_id}`, player,{ headers: {"Authorization" : `Bearer `+authHeader(),
-				"Access-Control-Allow-Origin": "*",
-				 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-			} });
+				await PlayerService.updatePlayer(player,_id);
 				console.log(player);
 				navigate(`/`);
 			} catch (error) {
-				console.log(error);
+				if (error.response.status === 401)
+            {
+                setErrorText("You are not authorised")
+            }
+            else
+            {
+                setErrorText("Unsuccesful action")
+            }
+
+
+			console.error(error);
+            setOpenFail(true);
 			}
 		}
 		updatePlayerPut();
@@ -103,6 +110,7 @@ export function UpdatePlayerComponent(props) {
 
 	function handleChange(event) {
 		setPlayer({ ...player, [event.target.name]: event.target.value });
+		console.log(player);
 	}
 
 	function handleChangeDate(date) {
@@ -148,8 +156,29 @@ export function UpdatePlayerComponent(props) {
 				<div className="form-group">
 				
             <label>Select Date: </label>
-            <DatePicker dateFormat="yyyy/MM/dd"  selected={player.dateOfBirth} onChange={(date) => handleChangeDate(date) } />
+
+			<LocalizationProvider dateAdapter={AdapterDayjs}>
+			<DatePicker
+				inputFormat="DD/MM/YYYY"
+    			label="Basic example"
+    			value={player.dateOfBirth}
+    			onChange={(date) => handleChangeDate(date) }
+    			renderInput={(params) => <TextField {...params} />}
+  				/>
+            </LocalizationProvider>
           </div>
+
+		  <div className="form-group">
+					<label>Position</label>
+					<select name="position" value={player.position} onChange={handleChange} className="form-control">
+							
+  							<option value="STRIKER">Striker</option>
+  							<option value="MIDFIELD">Midfield</option>
+  							<option value="DEFENDER">Defender</option>
+  							<option value="GOALKEEPER">Goalkeeper</option>
+					</select>
+					
+				</div>
 
 				
 				<div className="btn-group">
@@ -160,7 +189,7 @@ export function UpdatePlayerComponent(props) {
                                         <Alert severity="success">Smazáno!</Alert>
                                                                      </Snackbar>
                                         <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
-                                        <Alert severity="error">Akce se nezdařila</Alert>
+                                        <Alert severity="error">{errorText}</Alert>
                                                                      </Snackbar>
 					<button
 						type="button"

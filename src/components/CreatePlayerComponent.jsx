@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { post } from "axios";
+
 import { useNavigate, useParams } from "react-router-dom";
-import DatePicker from 'react-datepicker';
-import moment from 'moment';
+
+
 import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Alert from '@mui/material/Alert';
-import authHeader from './AuthHeader';
+
+import PlayerService from "../services/PlayerService";
+import { DatePicker,LocalizationProvider } from "@mui/x-date-pickers";
+import { TextField } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 export function CreatePlayerComponent() {
 
-	const [date, setDate] = useState(new Date());
+	
 	const [open, setOpen] = React.useState(false);
 	const [openFail, setOpenFail] = React.useState(false);
+	const [errorText, setErrorText] = React.useState(false);
 
 	const initialState = {
 		name: "",
 		surname: "",
-		dateOfBirth: date,
+		dateOfBirth: new Date(),
 		position: "STRIKER",
 	};
 	const [player, setPlayer] = useState(initialState);
@@ -34,16 +39,23 @@ export function CreatePlayerComponent() {
 		event.preventDefault();
 		async function addPlayer() {
 			try {
-				await post(`http://localhost:8080/player`, player,{ headers: {"Authorization" : `Bearer `+authHeader(),
-				"Access-Control-Allow-Origin": "*",
-				 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-			} });
+				await PlayerService.createPlayer(player);
 				console.log(player);
 				setOpen(true);
 				navigate(`/`);
 			} catch (error) {
-				console.log(error);
-				setOpenFail(true);
+				if (error.response.status === 401)
+            {
+                setErrorText("You are not authorised")
+            }
+            else
+            {
+                setErrorText("Unsuccesful action")
+            }
+
+
+			console.error(error);
+            setOpenFail(true);
 			}
 		}
 		addPlayer();
@@ -61,11 +73,7 @@ export function CreatePlayerComponent() {
 		navigate(`/`);
 	}
 
-	function updatePosition(position) {
-        setPlayer({
-            position: position.value
-        });
-    };
+	
 
 
 
@@ -122,7 +130,16 @@ export function CreatePlayerComponent() {
 				</div>
 				<div className="form-group">
             <label>Select Date: </label>
-            <DatePicker dateFormat="yyyy/MM/dd"  selected={player.dateOfBirth} onChange={(date) => handleChangeDate(date) } />
+			<LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DatePicker
+	  	inputFormat="DD/MM/YYYY"
+        label="Basic example"
+        value={player.dateOfBirth}
+        onChange={(date) => handleChangeDate(date)}
+        renderInput={(params) => <TextField {...params} />}
+      />
+    </LocalizationProvider>
+            
           </div>
 
 		  <div className="form-group">
@@ -158,7 +175,7 @@ export function CreatePlayerComponent() {
                                         <Alert severity="success">Smazáno!</Alert>
                                                                      </Snackbar>
                                         <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
-                                        <Alert severity="error">Akce se nezdařila</Alert>
+                                        <Alert severity="error">{errorText}</Alert>
                                                                      </Snackbar>
 		</div>
 	);

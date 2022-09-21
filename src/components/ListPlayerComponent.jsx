@@ -1,5 +1,5 @@
 
-import React, {action, useState, useEffect } from 'react'
+import React, {useState, useEffect } from 'react'
 import { Button, Row, Table } from 'reactstrap';
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -8,31 +8,36 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Alert from '@mui/material/Alert';
-import { matchSorter } from 'match-sorter';
+
 import PlayerService from '../services/PlayerService';
-import { parseISO, format, toDate } from 'date-fns';
-import { useTable, useFilters, useGlobalFilter, useAsyncDebounce } from 'react-table';
 import Moment from 'moment';
 
 
 function ListPlayerComponent() {
 
     const [players, setPlayers] = useState([]);
+    const [playerTeamName, setPlayerTeamName] = useState([])
     const [open, setOpen] = React.useState(false);
     const [openFail, setOpenFail] = React.useState(false);
+    const [errorText, setErrorText] = React.useState(false);
 
     const getAllData = () => {
-        axios.get('http://localhost:8080/players' ).then((response) => {
+        
+        
+
+
+        axios.get('http://localhost:8080/players').then((response) => {
             const myPlayers = response.data;
         setPlayers(myPlayers);
-    })
-        ;
+    });
         
         
       }
     
     useEffect(() =>{
         getAllData();
+        
+        
 			
 			
 		
@@ -47,16 +52,22 @@ function ListPlayerComponent() {
     async function handleDelete(id) {
 		try {
             console.log(authHeader())
-			await axios.delete(`http://localhost:8080/playerdel/${id}`,
-             { headers: {"Authorization" : `Bearer `+authHeader(),
-            "Access-Control-Allow-Origin": "*",
-             "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-        } });
+			await PlayerService.deletePlayer(id);
             getAllData();
             setOpen(true);
 
 			
 		} catch (error) {
+            if (error.response.status === 401)
+            {
+                setErrorText("You are not authorised")
+            }
+            else
+            {
+                setErrorText("Unsuccesful action")
+            }
+
+
 			console.error(error);
             setOpenFail(true);
             
@@ -108,7 +119,7 @@ function ListPlayerComponent() {
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Date of Birth</th>
-                            <th>Position</th>
+                            <th>Position</th>                            
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -122,9 +133,11 @@ function ListPlayerComponent() {
                                     <td> {Moment(player.dateOfBirth).format('DD. MMM YYYY')} </td>
                                     <td> {player.position}</td>
                                     
+                                    
                                     <td>
                                         
                                         <Link to={{ pathname:`/update-player/${player.id}`}}> <Button color="primary">Update</Button> </Link>
+
                                         <Button onClick={() => handleDelete(player.id)} className="btn btn-danger">Delete</Button>
                                         
                                     </td>
@@ -141,7 +154,7 @@ function ListPlayerComponent() {
                                         <Alert severity="success">Smazáno!</Alert>
                                                                      </Snackbar>
                                         <Snackbar open={openFail} autoHideDuration={6000} onClose={handleClose}  action={action}>
-                                        <Alert severity="error">Akce se nezdařila</Alert>
+                                        <Alert severity="error">{errorText}</Alert>
                                                                      </Snackbar>
         </div>
     );
