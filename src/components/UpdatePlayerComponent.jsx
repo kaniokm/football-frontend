@@ -60,7 +60,7 @@ export function UpdatePlayerComponent(props) {
 			}
 			updatePlayer();
 		},
-		
+		[props]
 	);
 	const handleClose = () => {
         
@@ -160,7 +160,7 @@ export function UpdatePlayerComponent(props) {
 			<LocalizationProvider dateAdapter={AdapterDayjs}>
 			<DatePicker
 				inputFormat="DD/MM/YYYY"
-    			label="Basic example"
+    			
     			value={player.dateOfBirth}
     			onChange={(date) => handleChangeDate(date) }
     			renderInput={(params) => <TextField {...params} />}
@@ -172,7 +172,7 @@ export function UpdatePlayerComponent(props) {
 					<label>Position</label>
 					<select name="position" value={player.position} onChange={handleChange} className="form-control">
 							
-  							<option value="STRIKER">Striker</option>
+  							<option selected value="STRIKER">Striker</option>
   							<option value="MIDFIELD">Midfield</option>
   							<option value="DEFENDER">Defender</option>
   							<option value="GOALKEEPER">Goalkeeper</option>

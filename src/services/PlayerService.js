@@ -35,7 +35,7 @@ class PlayerService {
     }
 
     deletePlayer(playerId){
-        return axios.delete(PLAYER_API_BASE_URL +`playerdel/${playerId}`,
+        return axios.delete(PLAYER_API_BASE_URL +`player/${playerId}`,
              { headers: {"Authorization" : `Bearer `+authHeader(),
             "Access-Control-Allow-Origin": "*",
              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
