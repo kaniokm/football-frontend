@@ -128,7 +128,7 @@ export function UpdatePlayerComponent(props) {
     
     return (
 		<div className="container">
-			<h1>Edit {player.name}</h1>
+			<h1>Edit {player.name +" "+ player.surname} </h1>
 			<hr />
 			<form onSubmit={handleSubmit}>
 				<div className="form-group">
@@ -171,8 +171,8 @@ export function UpdatePlayerComponent(props) {
 		  <div className="form-group">
 					<label>Position</label>
 					<select name="position" value={player.position} onChange={handleChange} className="form-control">
-							
-  							<option selected value="STRIKER">Striker</option>
+							<option value="">No position</option>
+  							<option value="STRIKER">Striker</option>
   							<option value="MIDFIELD">Midfield</option>
   							<option value="DEFENDER">Defender</option>
   							<option value="GOALKEEPER">Goalkeeper</option>

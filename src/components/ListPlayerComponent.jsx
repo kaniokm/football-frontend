@@ -16,7 +16,7 @@ import Moment from 'moment';
 function ListPlayerComponent() {
 
     const [players, setPlayers] = useState([]);
-    const [playerTeamName, setPlayerTeamName] = useState([])
+    
     const [open, setOpen] = React.useState(false);
     const [openFail, setOpenFail] = React.useState(false);
     const [errorText, setErrorText] = React.useState(false);
@@ -51,7 +51,7 @@ function ListPlayerComponent() {
     
     async function handleDelete(id) {
 		try {
-            console.log(authHeader())
+            
 			await PlayerService.deletePlayer(id);
             getAllData();
             setOpen(true);
@@ -119,7 +119,8 @@ function ListPlayerComponent() {
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Date of Birth</th>
-                            <th>Position</th>                            
+                            <th>Position</th>
+                            <th>Team</th>                            
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -132,7 +133,7 @@ function ListPlayerComponent() {
                                     <td> {player.surname} </td>
                                     <td> {Moment(player.dateOfBirth).format('DD. MMM YYYY')} </td>
                                     <td> {player.position}</td>
-                                    
+                                    <td> {player.teamName}</td>
                                     
                                     <td>
                                         
